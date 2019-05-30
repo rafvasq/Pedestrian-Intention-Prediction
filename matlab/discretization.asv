@@ -1,0 +1,9 @@
+data = importdata('..\PedestrianData\CleanData\2--2018-08-7--11-36-33.txt');
+[rows, columns] = size(data);
+
+gaze_histogram;
+
+for row = 1 : rows
+    %gaze = (data[row][
+    data[row]
+end
