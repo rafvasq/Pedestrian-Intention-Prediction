@@ -3,6 +3,7 @@ newDir = '..\..\PedestrianData\IntentionData\';
 
 step = 1;
 nbins = 8;
+edges = [0 45 90 135 180 225 270 315 360];
 
 for file = files'
     trial = load("..\..\PedestrianData\CleanData\" + file.name);
@@ -13,8 +14,13 @@ for file = files'
 
             % Calcluating head pose data
             cur_gaz = [ trial(row, 5), trial(row, 6), trial(row, 7)]; 
-            gaz_d = atan(cur_gaz(3) / cur_gaz(1)) * (360/pi);
-            dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
+            %gaz_d = (atan2d(cur_gaz(3) / cur_gaz(1)) /pi) * 180;
+            gaz_d = atan2d(cur_gaz(1), cur_gaz(3));
+            if gaz_d < 0
+               gaz_d = gaz_d + 360; 
+            end
+            dir_gaz = discretize(gaz_d, edges);
+            %dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
             
             trial(row, 8) = 0;          % vel x
             trial(row, 9) = 0;          % vel z
@@ -48,8 +54,13 @@ for file = files'
                 vel_d = NaN;
                 dir_vel = NaN;
             else
-                vel_d = atan(new_vel(3) / new_vel(1)) * (360/pi);
-                dir_vel = ceil( mod((vel_d + 22.5)/45, nbins) );
+                %vel_d = (atan(new_vel(3) / new_vel(1)) / pi) * 180;
+                vel_d = atan2d(new_vel(1), new_vel(3));
+                if vel_d < 0
+                   vel_d = vel_d + 360; 
+                end
+                dir_vel = discretize(vel_d, edges);
+                %dir_vel = ceil( mod((vel_d + 22.5)/45, nbins) );
             end
             
             % Calculate magnitude of acceleration
@@ -60,13 +71,23 @@ for file = files'
                 acc_d = NaN;
                 dir_acc = NaN;
             else
-                acc_d = atan(new_acc(2) / new_acc(1)) * (360/pi);
-                dir_acc = ceil( mod((acc_d + 22.5)/45, nbins) );
+                %acc_d = (atan(new_acc(2) / new_acc(1)) / pi) * 180;
+                acc_d = atan2d(new_acc(1), new_acc(2));
+                if acc_d < 0
+                   acc_d = acc_d + 360; 
+                end
+                dir_acc = discretize(acc_d, edges);
+                %dir_acc = ceil( mod((acc_d + 22.5)/45, nbins) );
             end
             
             % Calcluating head pose data
-            gaz_d = atan(cur_gaz(3) / cur_gaz(1)) * (360/pi);
-            dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
+            %gaz_d = (atan(cur_gaz(3) / cur_gaz(1)) / pi) * 180;
+            gaz_d = atan2d(cur_gaz(1), cur_gaz(3));
+            if gaz_d < 0
+               gaz_d = gaz_d + 360; 
+            end
+            dir_gaz = discretize(gaz_d, edges);
+            %dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
             
             trial(row,8) = new_vel(1);      % vel x
             trial(row,9) = new_vel(3);      % vel y
@@ -84,38 +105,3 @@ for file = files'
     end    
     writematrix(trial, [newDir file.name],'Delimiter','comma')
 end
-
-% Figures
-subplot(2,3,1)
-bar(trial(:,1), trial(:, 17));
-title('Velocity')
-
-subplot(2,3,2)
-bar(trial(:,1), trial(:, 18));
-title('Acceleration')
-
-subplot(2,3,3)
-bar(trial(:,1), trial(:, 19));
-title('Gaze')
-
-subplot(2,3,4)
-stem(trial(:,1), trial(:, 14));
-title('Velocity')
-
-subplot(2,3,5)
-stem(trial(:,1), trial(:, 15));
-title('Acceleration')
-
-subplot(2,3,6)
-stem(trial(:,1), trial(:, 16));
-title('Gaze')
-
-quiver(trial(:,1), trial(:,4), trial(:,5), trial(:,(7)), 1);
-
-figure;
-bar(trial(:,1), trial(:, 17));
-figure;
-bar(trial(:,1), trial(:, 18));
-figure;
-bar(trial(:,1), trial(:, 19));
-
