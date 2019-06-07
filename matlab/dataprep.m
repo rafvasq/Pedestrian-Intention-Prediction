@@ -34,12 +34,14 @@ for file = files'
             trial(row, 17) = 0;         % vel 8-bin
             trial(row, 18) = 0;         % acc 8-bin
             trial(row, 19) = dir_gaz;   % gaze 8-bin
+            trial(row, 20) = dir_gaz;   % change 8-bin
 
         else
             % Set variables
             last_vel =  [ trial(row-step, 8), trial(row-step, 9) ];
             last_pos =  [ trial(row-step, 2), trial(row-step, 3), trial(row-step, 4)];  
             cur_pos =   [ trial(row, 2), trial(row, 3), trial(row, 4)]; 
+            last_gaz_d = trial(row-step, 16); 
             cur_gaz =   [ trial(row, 5), trial(row, 6), trial(row, 7)]; 
             delta_t =   trial(row, 1) - trial(row-step, 1);
             if(delta_t == 0)
@@ -89,6 +91,15 @@ for file = files'
             dir_gaz = discretize(gaz_d, edges);
             %dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
             
+            tmp = ceil( (gaz_d - last_gaz_d + 30) / 10);
+            if (tmp < 0)
+                dir_chg = 1;
+            elseif (tmp > 7)
+                dir_chg = 8;
+            else
+                dir_chg = tmp;
+            end
+            
             trial(row,8) = new_vel(1);      % vel x
             trial(row,9) = new_vel(3);      % vel y
             trial(row,10) = new_acc(1);     % acc x
@@ -101,6 +112,7 @@ for file = files'
             trial(row,17) = dir_vel;        % vel 8-bin
             trial(row,18) = dir_acc;        % acc 8-bin
             trial(row,19) = dir_gaz;        % gaz 8-bin
+            trial(row,20) = dir_chg;        % change 8-bin
         end
     end    
     writematrix(trial, [newDir file.name],'Delimiter','comma')
