@@ -14,13 +14,11 @@ for file = files'
 
             % Calcluating head pose data
             cur_gaz = [ trial(row, 5), trial(row, 6), trial(row, 7)]; 
-            %gaz_d = (atan2d(cur_gaz(3) / cur_gaz(1)) /pi) * 180;
             gaz_d = atan2d(cur_gaz(1), cur_gaz(3));
             if gaz_d < 0
                gaz_d = gaz_d + 360; 
             end
             dir_gaz = discretize(gaz_d, edges);
-            %dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
             
             trial(row, 8) = 0;          % vel x
             trial(row, 9) = 0;          % vel z
@@ -53,16 +51,14 @@ for file = files'
             
             % Calculate the direction of velocity in 8 discrete classes
             if(new_vel == 0)
-                vel_d = NaN;
-                dir_vel = NaN;
+                vel_d = -1;
+                dir_vel = -1;
             else
-                %vel_d = (atan(new_vel(3) / new_vel(1)) / pi) * 180;
                 vel_d = atan2d(new_vel(1), new_vel(3));
                 if vel_d < 0
                    vel_d = vel_d + 360; 
                 end
                 dir_vel = discretize(vel_d, edges);
-                %dir_vel = ceil( mod((vel_d + 22.5)/45, nbins) );
             end
             
             % Calculate magnitude of acceleration
@@ -70,28 +66,25 @@ for file = files'
                    
             % Calculate the direction of acceleration in 8 discrete classes
             if(new_acc == 0)
-                acc_d = NaN;
-                dir_acc = NaN;
+                acc_d = -1;
+                dir_acc = -1;
             else
-                %acc_d = (atan(new_acc(2) / new_acc(1)) / pi) * 180;
                 acc_d = atan2d(new_acc(1), new_acc(2));
                 if acc_d < 0
                    acc_d = acc_d + 360; 
                 end
                 dir_acc = discretize(acc_d, edges);
-                %dir_acc = ceil( mod((acc_d + 22.5)/45, nbins) );
             end
             
             % Calcluating head pose data
-            %gaz_d = (atan(cur_gaz(3) / cur_gaz(1)) / pi) * 180;
             gaz_d = atan2d(cur_gaz(1), cur_gaz(3));
             if gaz_d < 0
                gaz_d = gaz_d + 360; 
             end
-            dir_gaz = discretize(gaz_d, edges);
-            %dir_gaz = ceil( mod((gaz_d + 22.5)/45, nbins) );
             
+            dir_gaz = discretize(gaz_d, edges);
             tmp = ceil( (gaz_d - last_gaz_d + 30) / 10);
+            
             if (tmp < 0)
                 dir_chg = 1;
             elseif (tmp > 7)
